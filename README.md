@@ -103,7 +103,7 @@ networks:
     external: true
 ```
 
-## 3. Create the docker containers
+## 4. Create the docker containers
 - ### 1. Firstly, build the parent container
   ```bash
   cd traefik-parent
@@ -114,7 +114,5 @@ networks:
   cd traefik-child-1
   docker compose up --build -d
   ```
-- ### 3. Finally, access the container
-  [http://localhost/traefik-1/api](http://localhost/traefik-1/api)
 
-If all the steps have been completed correctly, you should be able to access the container through `localhost/{{child-trafik-prefix}}/{{container-prefix}}`
+  ### If all the steps have been completed correctly, you should be able to access the container through [http://localhost/traefik-1/api](http://localhost/traefik-1/api)
