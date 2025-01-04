@@ -1,0 +1,43 @@
+services:
+  api-router-2:
+    container_name: api-router-2
+    image: traefik:latest
+    command:
+      - "--providers.docker=true"  # Enable Docker provider
+      - "--providers.docker.exposedbydefault=false"  # Don't expose all services by default
+      - "--entryPoints.web.address=:80"  # Define HTTP entrypoint
+    labels:
+      - "traefik.enable=true"
+      
+      # Router rule to match the /traefik/api path
+      - "traefik.http.routers.api-router-2.rule=PathPrefix(`/traefik-2`)"
+      - "traefik.http.routers.api-router-2.entrypoints=web"  # Use the web entrypoint
+      - "traefik.http.services.api-router-2.loadbalancer.server.port=80"  # Route traffic to port 5000 inside the API container
+
+      # Apply middleware to strip the /traefik prefix
+      - "traefik.http.routers.api-router-2.middlewares=strip-traefik-prefix-1"  # Apply middleware to strip the prefix
+
+      # Middleware definition for stripping the prefix
+      - "traefik.http.middlewares.strip-traefik-prefix-1.stripprefix.prefixes=/traefik-2"  # Strip /traefik from URL
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Traefik needs access to Docker socket
+    networks:
+      - proxy
+
+  api-2:
+    container_name: api-2
+    image: api-image
+    labels:
+      - "traefik.enable=true"
+      
+      # Router rule to match the /traefik/api path
+      - "traefik.http.routers.api-2.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.api-2.entrypoints=web"  # Use the web entrypoint
+      - "traefik.http.services.api-2.loadbalancer.server.port=5000"  # Route traffic to port 5000 inside the API container
+
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

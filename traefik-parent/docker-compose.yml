@@ -1,0 +1,21 @@
+
+services:
+  reverse-proxy:
+    container_name: reverse-proxy
+    image: traefik:latest
+    ports:
+      - "80:80"    # Expose HTTP port
+      - "8080:8080"  # Traefik Dashboard (optional)
+    command:
+      - "--api.insecure=true"  # Expose dashboard
+      - "--providers.docker=true"  # Enable Docker provider
+      - "--providers.docker.exposedbydefault=false"  # Don't expose all services by default
+      - "--entryPoints.web.address=:80"  # Define HTTP entrypoint
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Traefik needs access to Docker socket
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
